@@ -1,22 +1,45 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const readline = require('readline');
 
-async function vlrResponses() {
-    const upcomingResponse = await axios.get('https://www.vlr.gg/matches');
-    const previousResponse = await axios.get('https://www.vlr.gg/matches/results');
-    return [upcomingResponse.data, previousResponse.data];
+async function vlrSearch(type, subject) {
+    const searchResponse = await axios.get(`https://www.vlr.gg/search/?q=${subject}&type=${type}`);
+    return searchResponse.data;
 }
 
-async function scrapeVLR() {
-    console.log(await vlrResponses()); 
-    response = await vlrResponses();
-    up$ = cheerio.load(response[0]);
-    prev$ = cheerio.load(response[1]);
-    //const $ = cheerio.load(upcomingResponse.data);
-    for (const key in up$('div').has('.wf-card')) {
-        console.log(key);
+async function getResult() {
+    //console.log(await vlrSearch()); 
+    const userInput = await getUserInput();
+    const type = userInput[0];
+    const subject = userInput[1];
+    const response = await vlrSearch(type, subject);
+    const $searchPage = cheerio.load(response);
+    const pageLink = $searchPage('a.wf-module-item.search-item.mod-first').attr('href');
+    const teamPage = await axios.get(`https://www.vlr.gg${pageLink}`);
+    const $teamPage = cheerio.load(teamPage.data);
+}
+
+async function getUserInput() {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    
+    const question = (query) => new Promise(resolve => rl.question(query, resolve));
+
+    const type = await question('Enter search type (team/player): ');
+    if (type !== 'team' && type !== 'player') {
+        console.log('Invalid search type. Please try again, this time using either team or player');
+    } else { 
+        const subject = await question('Enter search subject: ');
     }
-    //console.log(typeof up$('div').has('.wf-card'));
+
+    rl.close();
+    return [type, subject];
 }
 
-scrapeVLR();
+async function getPlayerMatches(player) {
+
+}
+
+getResult();
