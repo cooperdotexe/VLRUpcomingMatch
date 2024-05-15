@@ -19,14 +19,10 @@ async function getResult() {
     let subjectResponse;
     if (type === 'team'){
          subjectResponse = await getTeamPage(pageLink);
-    } else if (type === 'player'){
+    } else {
          subjectResponse = await getPlayerPage(pageLink);
-    }
-    else {
-        console.log('Invalid search type. Please try again, this time using either team or player');
-    }
-    $subjectPage = cheerio.load(subjectResponse);
-    
+    };
+    $subjectPage = cheerio.load(subjectResponse);    
 }
 
 async function getUserInput() {
