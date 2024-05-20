@@ -8,9 +8,8 @@ async function vlrSearch(type, subject) {
 }
 
 async function getResult() {
-    //console.log(await vlrSearch()); 
     const userInput = await getUserInput();
-    const type = userInput[0];
+    const type = userInput[0].toLowerCase();
     const subject = userInput[1];
     console.log(`Searching for ${type} ${subject}`)
     const response = await vlrSearch(type, subject);
@@ -22,7 +21,15 @@ async function getResult() {
     } else {
          subjectResponse = await getPlayerPage(pageLink);
     };
-    $subjectPage = cheerio.load(subjectResponse);    
+    $subjectPage = cheerio.load(subjectResponse);
+    if (type === 'player') {
+        const teamLink = $subjectPage('.wf-module-item.mod-first').attr('href');
+        const teamResponse = await getTeamPage(teamLink);
+        $teamPage = cheerio.load(teamResponse);
+        getNextMatch($teamPage, subject);
+    } else {
+        getNextMatch($subjectPage, subject);
+    }
 }
 
 async function getUserInput() {
@@ -67,6 +74,26 @@ async function getPlayerPage(pageLink) {
 async function getTeamPage(pageLink) {
     const teamPage = await axios.get(`https://www.vlr.gg${pageLink}`);
     return teamPage.data;
+}
+
+async function getNextMatch($subjectPage, subject) {
+    const nextMatch = $subjectPage('.wf-card.fc-flex.m-item').find('.m-item-date').text();
+        const lines = nextMatch.trim().split('\n');
+        let firstDate;
+        let firstTime;
+    for (let i = 0; i < lines.length; i++) {
+        const trimmedLine = lines[i].trim();
+        if(trimmedLine) {
+            if (!firstDate) {
+                firstDate = new Date(Date.parse(trimmedLine));
+            } else if (!firstTime) {
+                firstTime = trimmedLine;
+                break;
+            }
+        }
+    }
+
+console.log(`Next match for ${subject} is on ${firstDate.toLocaleDateString()} at ${firstTime}`)
 }
 
 getResult();
