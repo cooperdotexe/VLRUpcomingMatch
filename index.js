@@ -21,11 +21,11 @@ async function getResult() {
     } else {
          subjectResponse = await getPlayerPage(pageLink);
     };
-    $subjectPage = cheerio.load(subjectResponse);
+    const $subjectPage = cheerio.load(subjectResponse);
     if (type === 'player') {
         const teamLink = $subjectPage('.wf-module-item.mod-first').attr('href');
         const teamResponse = await getTeamPage(teamLink);
-        $teamPage = cheerio.load(teamResponse);
+        const $teamPage = cheerio.load(teamResponse);
         getNextMatch($teamPage, subject);
     } else {
         getNextMatch($subjectPage, subject);
