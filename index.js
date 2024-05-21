@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const readline = require('readline');
 
 async function vlrSearch(type, subject) {
-    const searchResponse = await axios.get(`https://www.vlr.gg/search/?q=${subject}&type=${type}`);
+    const searchResponse = await axios.get(`https://www.vlr.gg/search/?q=${subject}&type=${type}s`);
     return searchResponse.data;
 }
 
