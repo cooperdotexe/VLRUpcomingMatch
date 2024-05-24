@@ -2,11 +2,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const readline = require('readline');
 
-async function vlrSearch(type, subject) {
-    const searchResponse = await axios.get(`https://www.vlr.gg/search/?q=${subject}&type=${type}s`);
-    return searchResponse.data;
-}
-
 async function getResult() {
     const userInput = await getUserInput();
     const type = userInput[0].toLowerCase();
@@ -94,6 +89,11 @@ async function getNextMatch($subjectPage, subject) {
     }
 
 console.log(`Next match for ${subject} is on ${firstDate.toLocaleDateString()} at ${firstTime}`)
+}
+
+async function vlrSearch(type, subject) {
+    const searchResponse = await axios.get(`https://www.vlr.gg/search/?q=${subject}&type=${type}s`);
+    return searchResponse.data;
 }
 
 getResult();
